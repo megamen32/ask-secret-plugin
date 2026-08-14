@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ask-secret",
+  "version": "0.1.0",
+  "description": "Create a one-time browser handoff link for entering a secret without putting the value in chat.",
+  "author": {
+    "name": "megamen32",
+    "url": "https://github.com/megamen32"
+  },
+  "repository": "https://github.com/megamen32/ask-secret-plugin",
+  "license": "MIT",
+  "keywords": ["secret", "credentials", "opaque-handoff", "mcp"]
+}
