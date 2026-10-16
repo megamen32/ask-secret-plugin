@@ -18,8 +18,10 @@ server. This repository contains no credentials.
 ## Use
 
 Invoke the discovered `asksecret` skill or the client-specific `/asksecret`
-command with a logical name, for example `github_token`. The user enters the
-value only at the one-time browser URL.
+command with an optional logical name, for example `github_token`. Without a
+name the server generates one; the agent asks no naming questions. One
+`ask_secret` call returns the input form. The user enters the value only at
+the one-time browser URL; retrying the same pending request reuses the link.
 
 ## Source and safety
 

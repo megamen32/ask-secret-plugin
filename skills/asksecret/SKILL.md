@@ -1,28 +1,31 @@
 ---
 name: asksecret
-description: Create a one-time browser link for entering a secret without exposing its value in chat.
+description: Open a one-time browser form for a secret; generate its name automatically when omitted.
 ---
 
-# Ask Secret
+# Secret input form
 
-Create an opaque, one-time browser handoff for a secret value. The secret must
-never be typed into the conversation, returned by an MCP tool, written to a
-file, placed in an argument or environment variable, or included in a summary.
+Use for `/secret`, `/asksecret`, and requests to hand over a password or token.
 
-## Procedure
+1. Use the supplied name. If absent, call `ask_secret({})`; the server generates
+   a name. If the loaded client schema still requires a name, generate
+   `secret_<random UUID>` locally. Never ask the human to name it.
+2. Call **AskSecret `ask_secret`**. It returns `pending` with `input_url`, or
+   `ready`. Present only the actual `/i/<token>` URL as a clickable Markdown
+   link: «Введите секрет в [защищённую форму](URL)».
+3. Keep the returned name/request identity for retries and the authorized
+   consumer. Reuse a pending form; do not create a series of different names.
+4. Compatibility: if an older server's `ask_secret` says only "not ready" or
+   is unavailable, call `get_secret` once with the SAME name. Forward only its
+   `/i/` input link. For a transient transport error, reconnect/retry once with
+   the same identity through the configured MCP; do not loop or alter credentials.
+5. `ready` means already supplied. Do not request it again or fetch its value
+   merely to show a form. An actual consumer needs the user's task authorization;
+   use the existing encrypted stdin route (`ask_secret_run` / `sss-run`).
 
-1. Read the optional user argument as the logical secret name. If absent, ask
-   only how to name the secret; never ask for the secret value.
-2. Confirm that the `AskSecret` MCP server exposes `get_secret`. If unavailable,
-   report the capability unavailable and do not fall back to chat input.
-3. Call `get_secret` with the name and a fresh opaque `request_id` when
-   supported. Use registered-agent encryption; never use a base64/plaintext
-   fallback.
-4. When the result is missing or pending, show only the one-time `/i/<token>`
-   browser URL as a clickable link.
-5. Never display or forward a `/d/<token>` URL, blob path, bearer token, API
-   key, or returned plaintext. Do not submit the form or fetch the secret.
-
-Reply briefly that the user should open the one-time link and enter the value
-there. A later approved consumer may retrieve it through the opaque runtime
-path; the value must remain outside chat output.
+Never request plaintext in chat. Never show secret values, `/d/` download URLs,
+encrypted blob paths or credentials. Never copy a secret into argv, environment,
+logs, memory or a summary. Do not invent an input URL or claim a form exists
+when the service returned no link. No automatic `.env` write merely from opening
+this form. A missing input capability is an exact blocker, not a request to paste
+secret values into chat.
